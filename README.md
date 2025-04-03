@@ -48,6 +48,24 @@ We will use the DeepSeek-R1 [tech report](https://github.com/deepseek-ai/DeepSee
 
 ## Installation
 
+Installation pipeline (tested)
+
+1. create a virtual environment with python 3.11
+```shell
+conda create -n openr1 python=3.11
+```
+
+2. activate the environment to install PyTorch v2.5.1, uv and nvcc 12.4
+```shell
+pip install uv
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+conda install nvidia/label/cuda-12.4.0::cuda-nvcc
+```
+
+3. run "make install" to install other dependencies.
+
+-----
+
 > [!CAUTION]
 > Libraries rely on CUDA 12.4. If you see errors related to segmentation faults, double check the version your system is running with `nvcc --version`.
 
