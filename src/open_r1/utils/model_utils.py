@@ -13,9 +13,9 @@ def get_tokenizer(
 ) -> PreTrainedTokenizer:
     """Get the tokenizer for the model."""
     tokenizer = AutoTokenizer.from_pretrained(
-        model_args.model_name_or_path,
-        revision=model_args.model_revision,
-        trust_remote_code=model_args.trust_remote_code,
+        model_args.model_name_or_path,  # 'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B'
+        revision=model_args.model_revision,  # 'main'
+        trust_remote_code=model_args.trust_remote_code,  # False
     )
 
     if training_args.chat_template is not None:

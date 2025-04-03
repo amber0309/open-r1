@@ -98,12 +98,13 @@ def main(script_args, training_args, model_args):
         init_wandb_training(training_args)
 
     ################
-    # Load datasets
+    # Load datasets - DatasetDict({'train': Dataset(), 'test': Dataset()})
     ################
     dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    dataset['train'] = dataset['train'].select(range(2000))
 
     ################
-    # Load tokenizer
+    # Load tokenizer - Qwen2TokenizerFast()
     ################
     tokenizer = get_tokenizer(model_args, training_args)
     tokenizer.pad_token = tokenizer.eos_token
@@ -128,7 +129,7 @@ def main(script_args, training_args, model_args):
     training_args.model_init_kwargs = model_kwargs
 
     ############################
-    # Initialize the SFT Trainer
+    # Initialize the SFT Trainer - trl.trainer.sft_trainer.SFTTrainer()
     ############################
     trainer = SFTTrainer(
         model=model_args.model_name_or_path,

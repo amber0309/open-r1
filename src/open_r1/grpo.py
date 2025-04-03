@@ -140,8 +140,8 @@ def main(script_args, training_args, model_args):
 
     # Check for last checkpoint
     last_checkpoint = None
-    if os.path.isdir(training_args.output_dir):
-        last_checkpoint = get_last_checkpoint(training_args.output_dir)
+    # if os.path.isdir(training_args.output_dir):
+        # last_checkpoint = get_last_checkpoint(training_args.output_dir)
     if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
         logger.info(f"Checkpoint detected, resuming training at {last_checkpoint=}.")
 
@@ -150,11 +150,12 @@ def main(script_args, training_args, model_args):
 
     # Load the dataset
     dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    # dataset['train'] = dataset['train'].select(range(100))
 
     ################
     # Load tokenizer
     ################
-    tokenizer = get_tokenizer(model_args, training_args)
+    tokenizer = get_tokenizer(model_args, training_args)  # LlamaTokenizerFast()
 
     # Get reward functions
     REWARD_FUNCS_REGISTRY = {
@@ -177,7 +178,7 @@ def main(script_args, training_args, model_args):
         "code_format": get_code_format_reward(language=script_args.code_language),
         "tag_count": tag_count_reward,
     }
-    reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
+    reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs] # [accuracy_reward(), format_reward(), tag_count_reward()]
 
     # Format into conversation
     def make_conversation(example):
@@ -189,7 +190,7 @@ def main(script_args, training_args, model_args):
         prompt.append({"role": "user", "content": example["problem"]})
         return {"prompt": prompt}
 
-    dataset = dataset.map(make_conversation)
+    dataset = dataset.map(make_conversation)  # add 'prompt' in each sample dict
 
     for split in dataset:
         if "messages" in dataset[split].column_names:
@@ -212,14 +213,14 @@ def main(script_args, training_args, model_args):
     # Initialize the GRPO trainer
     #############################
     trainer = GRPOTrainer(
-        model=model_args.model_name_or_path,
+        model=model_args.model_name_or_path,  # 'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B'
         reward_funcs=reward_funcs,
-        args=training_args,
-        train_dataset=dataset[script_args.dataset_train_split],
-        eval_dataset=dataset[script_args.dataset_test_split] if training_args.eval_strategy != "no" else None,
-        peft_config=get_peft_config(model_args),
-        callbacks=get_callbacks(training_args, model_args),
-        processing_class=tokenizer,
+        args=training_args,  # GRPOConfig()
+        train_dataset=dataset[script_args.dataset_train_split],  # Dataset()
+        eval_dataset=dataset[script_args.dataset_test_split] if training_args.eval_strategy != "no" else None,  # None
+        peft_config=get_peft_config(model_args),  # None
+        callbacks=get_callbacks(training_args, model_args),  # []
+        processing_class=tokenizer,  # LlamaTokenizerFast()
     )
 
     ###############
